@@ -11,7 +11,6 @@ void strip_newline(char *str) {
 
 int main() {
     printf("Client login\n");
-    printf("You have to choose your chat\n");
 
     printf("Enter server IP: ");
     char server_ip[100];

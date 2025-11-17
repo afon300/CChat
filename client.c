@@ -9,6 +9,11 @@
 #define BUFFER_SIZE 2048
 #define PORT 8080
 
+pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+#define COLOR_GREEN   "\033[32m"
+#define COLOR_RESET   "\033[0m"
+
 void* receive_thread(void* arg) {
     int client_socket = *(int*)arg;
     char buffer[BUFFER_SIZE];
@@ -16,8 +21,16 @@ void* receive_thread(void* arg) {
 
     while ((bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0)) > 0) {
         buffer[bytes_received] = '\0';
-        printf("%s", buffer); 
+
+        pthread_mutex_lock(&stdout_mutex);
+        printf("\r\033[K");
+
+        printf("%s", buffer);
+
+        printf("[YOU] />");
         fflush(stdout);
+        
+        pthread_mutex_unlock(&stdout_mutex);
     }
 
     if (bytes_received == 0) {
@@ -69,8 +82,6 @@ int start_client(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("Connected to server as '%s'.\n", nickname);
-
     if (send(client_socket, nickname, strlen(nickname), 0) < 0) {
         perror("send nickname");
         close(client_socket);
@@ -83,27 +94,37 @@ int start_client(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("You can now type messages. (Type 'exit' to quit)\n");
+    printf("You can now type messages. (Type '/exit' to quit)\n");
+    
+    printf("[YOU] />");
+    fflush(stdout);
+    
     while (1) {
         if (fgets(buffer, BUFFER_SIZE, stdin) == NULL) {
             break;
         }
 
-        if (strncmp(buffer, "exit\n", 5) == 0) {
+        if (strncmp(buffer, "/exit\n", 6) == 0) {
             break;
         }
 
         if (send(client_socket, buffer, strlen(buffer), 0) < 0) {
             perror("send message");
             break;
-       
-       
         }
+        pthread_mutex_lock(&stdout_mutex);
 
-}
+        printf("\033[1A\033[K");
+        printf(COLOR_GREEN "you : %s" COLOR_RESET, buffer);
+        
+        printf("[YOU] />");
+        fflush(stdout);
+        
+        pthread_mutex_unlock(&stdout_mutex);
+    }
+    
     printf("Disconnecting...\n");
     close(client_socket);
     
     return 0;
-    
 }
