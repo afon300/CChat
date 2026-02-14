@@ -82,4 +82,4 @@ make test
 
 ## License
 
-This project is provided for educational purposes. Feel free to use and modify it for your own learning.
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
