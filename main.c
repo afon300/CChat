@@ -4,23 +4,32 @@
 
 #include "client.h"
 
+/**
+ * Removes the trailing newline character from a string.
+ * Useful after a fgets() call.
+ */
 void strip_newline(char *str) {
-
     str[strcspn(str, "\n")] = 0;
 }
 
+/**
+ * Client application entry point.
+ * Handles credential acquisition and session launch.
+ */
 int main() {
-    printf("Client login\n");
+    printf("CChat - Client Login\n");
 
-    printf("Enter server IP: ");
+    /* Prompt for remote server address */
+    printf("Server IP address: ");
     char server_ip[100];
     if (fgets(server_ip, sizeof(server_ip), stdin) == NULL) {
-        fprintf(stderr, "Error reading server IP.\n");
+        fprintf(stderr, "Error reading IP.\n");
         return 1;
     }
     strip_newline(server_ip);
 
-    printf("Enter your nickname: ");
+    /* Prompt for user nickname */
+    printf("Your nickname: ");
     char nickname[32];
     if (fgets(nickname, sizeof(nickname), stdin) == NULL) {
         fprintf(stderr, "Error reading nickname.\n");
@@ -28,12 +37,14 @@ int main() {
     }
     strip_newline(nickname);
 
+    /* Prepare arguments for the client module */
     char *client_args[] = { "client", server_ip, nickname };
     
     printf("Attempting to connect to %s as %s...\n", server_ip, nickname);
 
+    /* Launch network logic */
     if (start_client(3, client_args) != 0) {
-        fprintf(stderr, "Client connection process failed.\n");
+        fprintf(stderr, "Connection process failed.\n");
         return 1;
     }
 

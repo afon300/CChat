@@ -1,3 +1,22 @@
-main
-server
+# Binaries
+bin/
+*.exe
+
+# Objects
+obj/
 *.o
+*.obj
+
+# Tests & Coverage
+tests/__pycache__/
+.pytest_cache/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.log
+*.tmp
